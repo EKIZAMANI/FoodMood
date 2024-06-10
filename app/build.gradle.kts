@@ -1,8 +1,6 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
-    id("com.google.devtools.ksp")
-    id("kotlin-parcelize")
 }
 
 android {
@@ -14,7 +12,7 @@ android {
         minSdk = 21
         targetSdk = 34
         versionCode = 1
-        versionName = "1.0"
+        versionName = "0.0.1a"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -57,8 +55,5 @@ dependencies {
     implementation(libs.material)
     implementation(libs.androidx.navigation.fragment.ktx)
     implementation(libs.androidx.navigation.ui.ktx)
-    implementation ("com.google.android.material:material:1.0.0")
-    implementation ("com.github.bumptech.glide:glide:4.11.0")
-    implementation("de.hdodenhof:circleimageview:3.1.0")
-    implementation("jp.wasabeef:blurry:4.0.0")
+    implementation(libs.glide)
 }
