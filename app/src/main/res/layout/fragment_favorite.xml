@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    tools:context=".ui.favorite.FavoriteFragment"
+    tools:context=".ui.fragment.FavoriteFragment"
     android:layout_marginTop="-20dp"
     >
 
@@ -41,8 +41,7 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
-        android:layout_height="603dp"
-        android:paddingTop="20dp"
+        android:layout_height="wrap_content"
         tools:ignore="MissingConstraints"
 
         tools:listitem="@layout/item_food" />
