@@ -61,7 +61,8 @@
         <androidx.cardview.widget.CardView
             android:layout_width="100dp"
             android:layout_height="1dp"
-            app:cardBackgroundColor="@color/colorPrimary" />
+            app:cardBackgroundColor="@color/colorPrimary"
+            app:cardElevation="0dp"/>
 
         <TextView
             android:layout_width="wrap_content"
@@ -76,14 +77,16 @@
         <androidx.cardview.widget.CardView
             android:layout_width="100dp"
             android:layout_height="1dp"
-            app:cardBackgroundColor="@color/colorPrimary" />
+            app:cardBackgroundColor="@color/colorPrimary"
+            app:cardElevation="0dp"/>
     </LinearLayout>
 
 
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:cardCornerRadius="10dp">
+        app:cardCornerRadius="10dp"
+        app:cardElevation="0dp">
 
         <FrameLayout
             android:layout_width="match_parent"

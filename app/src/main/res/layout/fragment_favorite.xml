@@ -27,12 +27,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="30dp"
-                android:fontFamily="@font/poppins_bold"
+                android:fontFamily="@font/poppins_semibold"
                 android:layout_marginTop="50dp"
                 android:text="Favorite"
                 android:textColor="@color/white"
-                android:textSize="25sp"
-                android:textStyle="bold" />
+                android:textSize="22sp"/>
         </LinearLayout>
 
     </androidx.cardview.widget.CardView>
@@ -43,6 +42,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         tools:ignore="MissingConstraints"
+        android:paddingTop="20dp"
 
         tools:listitem="@layout/item_food" />
 
