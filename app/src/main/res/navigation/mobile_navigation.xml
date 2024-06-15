@@ -7,9 +7,9 @@
 
     <fragment
         android:id="@+id/navigation_home"
-        android:name="com.capstone.foodmood.ui.fragment.HomeFragment"
+        android:name="com.capstone.foodmood1.ui.fragment.HomeFragment"
         android:label="@string/title_home"
-        tools:layout="@layout/fragment_home">
+        tools:layout="@layout/fragment_bookmark">
 
         <action
             android:id="@+id/action_start_to_result"
@@ -18,19 +18,19 @@
 
     <fragment
         android:id="@+id/navigation_favorite"
-        android:name="com.capstone.foodmood.ui.fragment.FavoriteFragment"
+        android:name="com.capstone.foodmood1.ui.fragment.BookmarkFragment"
         android:label="@string/title_favorite"
-        tools:layout="@layout/fragment_favorite" />
+        tools:layout="@layout/fragment_home" />
 
     <fragment
         android:id="@+id/navigation_profile"
-        android:name="com.capstone.foodmood.ui.fragment.ProfileFragment"
+        android:name="com.capstone.foodmood1.ui.fragment.ProfileFragment"
         android:label="@string/title_profile"
         tools:layout="@layout/fragment_profile" />
 
     <fragment
         android:id="@+id/resultFragment"
-        android:name="com.capstone.foodmood.ui.fragment.ResultFragment"
+        android:name="com.capstone.foodmood1.ui.fragment.FoodFragment"
         android:label="Result Fragment"
-        tools:layout="@layout/fragment_result"/>
+        tools:layout="@layout/fragment_food"/>
 </navigation>

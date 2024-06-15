@@ -2,16 +2,15 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context=".ui.activity.DetailActivity">
 
     <androidx.cardview.widget.CardView
-        android:id="@+id/cardView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="-30dp"
         app:cardCornerRadius="30dp"
         tools:ignore="MissingConstraints">
 
@@ -24,9 +23,9 @@
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:layout_marginTop="30dp"
-                android:layout_marginRight="30dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="60dp"
+                android:layout_marginEnd="30dp"
                 android:gravity="center">
 
                 <ImageView
@@ -36,12 +35,13 @@
                     android:src="@drawable/ic_back_white" />
 
                 <TextView
+                    android:id="@+id/tv_name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="10dp"
+                    android:layout_marginStart="10dp"
                     android:fontFamily="@font/poppins_bold"
-                    android:text="Nasi padang uda sayang aaaaaaaaaaaaaaaaaaaaaaa"
                     android:singleLine="true"
+                    android:text="Nasi padang uda sayang aaaaaaaaaaaaaaaaaaaaaaa"
                     android:textColor="@color/white"
                     android:textSize="18sp" />
             </LinearLayout>
@@ -57,11 +57,11 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="30dp"
-                    android:background="@drawable/button_background"
-                    android:outlineAmbientShadowColor="@color/colorPrimary"
+                    android:background="@drawable/bg_button"
                     app:cardCornerRadius="20dp">
 
                     <ImageView
+                        android:id="@+id/iv_photo"
                         android:layout_width="match_parent"
                         android:layout_height="250dp"
                         android:scaleType="centerCrop"
@@ -96,6 +96,7 @@
 
                 <ImageView
                     android:id="@+id/iv_bookmark"
+                    style="@style/CustomImageView"
                     android:layout_width="32dp"
                     android:layout_height="27dp"
                     android:layout_margin="15dp"
@@ -115,7 +116,7 @@
             android:layout_height="wrap_content"
             android:fontFamily="@font/poppins"
             android:text="Bahan-bahan"
-            android:textSize="16dp"
+            android:textSize="16sp"
             android:textStyle="bold" />
 
         <TextView
@@ -124,14 +125,16 @@
             android:fontFamily="@font/poppins"
             android:justificationMode="inter_word"
             android:text="250 gr daging ayam (saya pakai fillet)--Secukupnya gula dan garam--50-100 gr tepung ayam serbaguna--Secukupnya lalapan (kemangi,kol,timun)--Secukupnya minyak panas-- sambal korek--Secukupnya cabe rawit merah dan bwg putih--"
-            android:textSize="12dp" />
+            android:textSize="12sp"
+            tools:ignore="UnusedAttribute" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
             android:fontFamily="@font/poppins"
             android:text="Cara memasak"
-            android:textSize="16dp"
+            android:textSize="16sp"
             android:textStyle="bold" />
 
         <TextView
@@ -140,6 +143,7 @@
             android:fontFamily="@font/poppins"
             android:justificationMode="inter_word"
             android:text="Goreng ayam seperti ayam krispi--Ulek semua bahan sambal kemudian campur dengan minyak panas bekas goreng ayam--Geprek ayam kemudian campur dengan sambal,sajikan dengan lalapan  --"
-            android:textSize="12dp" />
+            android:textSize="12sp"
+            tools:ignore="UnusedAttribute" />
     </LinearLayout>
 </LinearLayout>

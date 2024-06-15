@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "908385055947",
+    "firebase_url": "https://food-mood-716eb-default-rtdb.firebaseio.com",
+    "project_id": "food-mood-716eb",
+    "storage_bucket": "food-mood-716eb.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:908385055947:android:25c3d7ee45eeacc0ee974e",
+        "android_client_info": {
+          "package_name": "com.capstone.foodmood1"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "908385055947-crtgngg475mg13dpv6pidjegoafh5kaq.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.capstone.foodmood1",
+            "certificate_hash": "c0df121b8ddaaf0d96dd3e4cab3dd50299bc7610"
+          }
+        },
+        {
+          "client_id": "908385055947-80hbne7u0msnp22g2bpn8hmtncoh08bu.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB65BM7gEGj9qQUiYxCThp6B1Tr7aVlhPU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "908385055947-80hbne7u0msnp22g2bpn8hmtncoh08bu.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

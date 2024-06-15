@@ -1,18 +1,19 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
+    id("com.google.gms.google-services")
 }
 
 android {
-    namespace = "com.capstone.foodmood"
+    namespace = "com.capstone.foodmood1"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.capstone.foodmood"
-        minSdk = 21
+        applicationId = "com.capstone.foodmood1"
+        minSdk = 23
         targetSdk = 34
-        versionCode = 1
-        versionName = "0.0.1a"
+        versionCode = 24061510
+        versionName = "0.0.2a"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -25,6 +26,10 @@ android {
                 "proguard-rules.pro"
             )
         }
+        defaultConfig {
+            buildConfigField("String", "CLIENT_ID", "\"908385055947-80hbne7u0msnp22g2bpn8hmtncoh08bu.apps.googleusercontent.com\"")
+            buildConfigField("String", "BASE_URL", "\"https://fomo-f5lpd4ofwq-et.a.run.app/\"")
+        }
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
@@ -35,6 +40,7 @@ android {
     }
     buildFeatures {
         viewBinding = true
+        buildConfig = true
     }
 }
 
@@ -49,6 +55,9 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.androidx.navigation.fragment.ktx)
     implementation(libs.androidx.navigation.ui.ktx)
+    implementation(libs.firebase.auth)
+    implementation(libs.googleid)
+    implementation(libs.firebase.database)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -56,4 +65,10 @@ dependencies {
     implementation(libs.androidx.navigation.fragment.ktx)
     implementation(libs.androidx.navigation.ui.ktx)
     implementation(libs.glide)
+    implementation(libs.play.services.auth)
+    implementation(libs.androidx.credentials)
+    implementation(libs.androidx.credentials.play.services.auth)
+    implementation(platform("com.google.firebase:firebase-bom:33.1.0"))
+    implementation("com.google.firebase:firebase-analytics")
+    implementation("androidx.datastore:datastore-preferences:1.1.1")
 }

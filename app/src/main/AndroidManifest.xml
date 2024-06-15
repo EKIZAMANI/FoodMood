@@ -7,11 +7,15 @@
         android:required="false" />
 
     <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
+    <uses-permission
+        android:name="android.permission.READ_EXTERNAL_STORAGE"
         android:maxSdkVersion="32" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         android:maxSdkVersion="32"
         tools:ignore="ScopedStorage" />
+
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:allowBackup="true"
@@ -30,13 +34,13 @@
             android:name=".ui.activity.DetailActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.activity.ResepkuActivity"
+            android:name=".ui.activity.MyFoodActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.activity.EditProfileActivity"
+            android:name=".ui.activity.EditActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.activity.HomeActivity"
+            android:name=".ui.activity.MainActivity"
             android:exported="false"
             android:label="@string/title_activity_home" />
         <activity
@@ -54,15 +58,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <service android:name="com.google.android.gms.metadata.ModuleDependencies"
-            android:enabled="false"
-            android:exported="false"
-            tools:ignore="MissingClass">
-            <intent-filter>
-                <action android:name="com.google.android.gms.metadata.MODULE_DEPENDENCIES" />
-            </intent-filter>
-            <meta-data android:name="photopicker_activity:0:required" android:value="" />
-        </service>
     </application>
 
 </manifest>
