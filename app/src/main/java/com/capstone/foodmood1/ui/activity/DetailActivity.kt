@@ -2,6 +2,7 @@ package com.capstone.foodmood1.ui.activity
 
 import android.app.AlertDialog
 import android.content.DialogInterface
+import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
@@ -32,7 +33,9 @@ class DetailActivity : AppCompatActivity() {
             ivBack.setOnClickListener {
                 finish()
             }
-
+            btnSubmit.setOnClickListener {
+                startActivity(Intent(this@DetailActivity, CommentActivity::class.java))
+            }
             if (isOwn) {
                 ivBookmark.setImageResource(R.drawable.ic_delete)
 

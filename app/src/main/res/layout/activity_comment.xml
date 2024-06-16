@@ -6,7 +6,7 @@
     android:orientation="vertical"
     android:paddingHorizontal="30dp"
     android:paddingVertical="16dp"
-    tools:context=".ui.activity.EditActivity">
+    tools:context=".ui.activity.CommentActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -33,13 +33,34 @@
                 android:layout_marginStart="20dp"
                 android:fontFamily="@font/poppins"
                 android:gravity="start"
-                android:text="Edit Profile"
-                android:textSize="22sp"
+                android:text="Tambahkan Komentar"
+                android:textSize="20sp"
                 android:textStyle="bold"
                 android:layout_gravity="center"
                 />
         </LinearLayout>
     </LinearLayout>
+
+
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Rating"
+        android:textSize="18sp"
+        android:layout_marginLeft="5dp"
+        android:fontFamily="@font/poppins_light"/>
+    <RatingBar
+        android:id="@+id/rtbHighScore"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="45dp"
+        android:numStars="5"
+        android:max="100"
+        android:rating="0.0"
+        android:stepSize="0.0"
+        />
+
 
     <com.google.android.material.textfield.TextInputLayout
         style="@style/CustomTextInputLayout"
@@ -47,50 +68,27 @@
         android:layout_height="wrap_content">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/et_name"
+            android:id="@+id/et_ingredient"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="100dp"
             android:layout_marginVertical="5dp"
             android:fontFamily="@font/poppins"
-            android:hint="Name"
-            android:inputType="textEmailAddress"
+            android:gravity="top"
+            android:hint="Komentar"
+            android:inputType="text"
             android:padding="12dp" />
     </com.google.android.material.textfield.TextInputLayout>
 
-    <com.google.android.material.textfield.TextInputLayout
-        style="@style/CustomTextInputLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
 
-        <com.capstone.foodmood1.custom.CustomEditEmail
-            android:id="@+id/et_email"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginVertical="5dp"
-            android:fontFamily="@font/poppins"
-            android:hint="Email"
-            android:inputType="textEmailAddress"
-            android:padding="12dp" />
-    </com.google.android.material.textfield.TextInputLayout>
 
-    <!--    <EditText-->
-    <!--        android:layout_width="match_parent"-->
-    <!--        android:layout_height="wrap_content"-->
-    <!--        android:layout_marginVertical="5dp"-->
-    <!--        android:background="@drawable/edit_text_background"-->
-    <!--        android:fontFamily="@font/poppins"-->
-    <!--        android:hint="Nomer Telepon"-->
-    <!--        android:inputType="textPassword"-->
-    <!--        android:padding="12dp"-->
-    <!--        android:textColor="#000000" />-->
 
     <Button
         android:id="@+id/btn_submit"
         style="@style/CustomButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="10dp"
         android:fontFamily="@font/poppins"
-        android:text="SUBMIT"
+        android:text="TAMBAHKAN"
         android:textSize="18sp" />
 </LinearLayout>
