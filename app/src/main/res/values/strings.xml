@@ -14,4 +14,16 @@
     <string name="favorite">title_favorite</string>
     <string name="title_favorite">Favorite</string>
     <string name="text_search">Mau makanan kek apa?</string>
+
+
+    <string-array name="food_category">
+        <item>Ayam</item>
+        <item>Ikan</item>
+        <item>Kambing</item>
+        <item>Sapi</item>
+        <item>Tahu</item>
+        <item>Telur</item>
+        <item>Tempe</item>
+        <item>Udang</item>
+    </string-array>
 </resources>

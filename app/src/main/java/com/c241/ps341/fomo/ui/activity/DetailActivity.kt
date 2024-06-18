@@ -2,9 +2,9 @@ package com.c241.ps341.fomo.ui.activity
 
 import android.app.AlertDialog
 import android.app.ProgressDialog
+import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -55,9 +55,15 @@ class DetailActivity : AppCompatActivity() {
         with(binding) {
             setContentView(root)
 
+            btnSubmit.setOnClickListener {
+                startActivity(Intent(this@DetailActivity, CommentActivity::class.java))
+            }
+
             ivBack.setOnClickListener {
                 finish()
             }
+
+
 
             if (isOwn) {
                 ivBookmark.setImageResource(R.drawable.ic_delete)

@@ -9,27 +9,36 @@
     tools:context=".ui.activity.EditActivity">
 
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="50dp"
-        android:gravity="center_vertical">
+        android:gravity="start">
 
         <ImageView
             android:id="@+id/iv_back"
             style="@style/CustomImageView"
-            android:layout_width="35dp"
-            android:layout_height="35dp"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
             android:src="@drawable/ic_back" />
 
-        <TextView
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:fontFamily="@font/poppins"
-            android:gravity="start"
-            android:text="Edit Profile"
-            android:textSize="22sp"
-            android:textStyle="bold" />
+            android:gravity="center"
+            android:layout_marginRight="60dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:fontFamily="@font/poppins"
+                android:gravity="start"
+                android:text="Edit Profile"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:layout_gravity="center"
+                />
+        </LinearLayout>
     </LinearLayout>
 
     <com.google.android.material.textfield.TextInputLayout
