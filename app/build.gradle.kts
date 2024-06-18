@@ -5,15 +5,15 @@ plugins {
 }
 
 android {
-    namespace = "com.capstone.foodmood1"
+    namespace = "com.c241.ps341.fomo"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.capstone.foodmood1"
+        applicationId = "com.c241.ps341.fomo"
         minSdk = 23
         targetSdk = 34
-        versionCode = 24061510
-        versionName = "0.0.2a"
+        versionCode = 24061623
+        versionName = "0.0.3a"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -27,7 +27,7 @@ android {
             )
         }
         defaultConfig {
-            buildConfigField("String", "CLIENT_ID", "\"908385055947-80hbne7u0msnp22g2bpn8hmtncoh08bu.apps.googleusercontent.com\"")
+            buildConfigField("String", "CLIENT_ID", "\"908454400659-1vf2fv9hrhang9rf0urpeckc48ba67hi.apps.googleusercontent.com\"")
             buildConfigField("String", "BASE_URL", "\"https://fomo-f5lpd4ofwq-et.a.run.app/\"")
         }
     }
@@ -58,6 +58,7 @@ dependencies {
     implementation(libs.firebase.auth)
     implementation(libs.googleid)
     implementation(libs.firebase.database)
+    implementation(libs.firebase.storage)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -71,4 +72,7 @@ dependencies {
     implementation(platform("com.google.firebase:firebase-bom:33.1.0"))
     implementation("com.google.firebase:firebase-analytics")
     implementation("androidx.datastore:datastore-preferences:1.1.1")
+    implementation("com.squareup.retrofit2:retrofit:2.6.2")
+    implementation("com.squareup.retrofit2:converter-gson:2.6.2")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.11.0")
 }
