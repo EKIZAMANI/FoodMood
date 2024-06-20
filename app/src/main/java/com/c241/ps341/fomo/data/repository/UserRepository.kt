@@ -16,13 +16,12 @@ class UserRepository {
         photoUrl: String
     ) {
         val user = UserData(name, password, email, photoUrl)
-        database.child("user").child(id).setValue(user)
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    Log.i("Firebase", "User created")
-                } else {
-                    Log.e("Firebase", "Error to create user")
-                }
+        database.child("user").child(id).setValue(user).addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                Log.i("Firebase", "User created")
+            } else {
+                Log.e("Firebase", "Error to create user")
             }
+        }
     }
 }

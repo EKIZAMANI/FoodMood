@@ -2,19 +2,19 @@ package com.c241.ps341.fomo.api.response
 
 import com.google.gson.annotations.SerializedName
 
-data class FoodResponse(
+data class FoodPostResponse(
 
 	@field:SerializedName("data")
-	val data: List<FoodDataItem?>? = null,
+	val data: FoodPostData? = null,
 
 	@field:SerializedName("message")
 	val message: String? = null
 )
 
-data class FoodDataItem(
+data class FoodPostData(
 
 	@field:SerializedName("image")
-	val image: String? = null,
+	val image: Any? = null,
 
 	@field:SerializedName("foodName")
 	val foodName: String? = null,
@@ -38,8 +38,5 @@ data class FoodDataItem(
 	val steps: String? = null,
 
 	@field:SerializedName("url")
-	val url: String? = null,
-
-	@field:SerializedName("bookmark_counts")
-	val bookmarkCounts: Int? = null
+	val url: Any? = null
 )

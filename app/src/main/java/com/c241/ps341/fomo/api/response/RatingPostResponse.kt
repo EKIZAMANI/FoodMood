@@ -2,19 +2,22 @@ package com.c241.ps341.fomo.api.response
 
 import com.google.gson.annotations.SerializedName
 
-data class BookmarkPostResponse(
+data class RatingPostResponse(
 
 	@field:SerializedName("data")
-	val data: FoodData? = null,
+	val data: RatingPostData? = null,
 
 	@field:SerializedName("message")
 	val message: String? = null
 )
 
-data class FoodData(
+data class RatingPostData(
 
 	@field:SerializedName("user_id")
 	val userId: String? = null,
+
+	@field:SerializedName("rate")
+	val rate: Int? = null,
 
 	@field:SerializedName("id")
 	val id: Int? = null,

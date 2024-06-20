@@ -1,6 +1,10 @@
 package com.c241.ps341.fomo.api
 
+import android.content.Context
 import com.c241.ps341.fomo.BuildConfig
+import com.c241.ps341.fomo.data.local.UserPreferences
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -11,18 +15,10 @@ class ApiConfig {
     companion object {
         private lateinit var apiService: ApiService
 
-        fun getApiService(token: String): ApiService {
+        fun getApiService(): ApiService {
             val loggingInterceptor = HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY)
-            val authInterceptor = Interceptor { chain ->
-                val req = chain.request()
-                val requestHeaders = req.newBuilder()
-                    .addHeader("Authorization", "bearer $token")
-                    .build()
-                chain.proceed(requestHeaders)
-            }
             val client = OkHttpClient.Builder()
                 .addInterceptor(loggingInterceptor)
-                .addInterceptor(authInterceptor)
                 .build()
             val retrofit = Retrofit.Builder()
                 .baseUrl(BuildConfig.BASE_URL)

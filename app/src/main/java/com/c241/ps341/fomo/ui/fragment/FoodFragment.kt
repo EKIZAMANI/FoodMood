@@ -6,10 +6,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.c241.ps341.fomo.R
 import com.c241.ps341.fomo.adapter.FoodAdapter
@@ -17,16 +15,14 @@ import com.c241.ps341.fomo.api.response.FoodDataItem
 import com.c241.ps341.fomo.databinding.FragmentFoodBinding
 import com.c241.ps341.fomo.ui.activity.DetailActivity
 import com.c241.ps341.fomo.ui.model.MainViewModel
-import com.c241.ps341.fomo.ui.model.UserViewModel
-import kotlinx.coroutines.launch
+import com.c241.ps341.fomo.ui.model.ViewModelFactory
 
 @Suppress("DEPRECATION")
 class FoodFragment : Fragment() {
     private var _binding: FragmentFoodBinding? = null
     private val binding get() = _binding!!
     private lateinit var adapter: FoodAdapter
-    private lateinit var mainModel: MainViewModel
-    private lateinit var userModel: UserViewModel
+    private lateinit var viewModel: MainViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -37,35 +33,47 @@ class FoodFragment : Fragment() {
             View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
         requireActivity().window.statusBarColor = Color.TRANSPARENT
         _binding = FragmentFoodBinding.inflate(inflater, container, false)
-        adapter = FoodAdapter(context, false)
-        mainModel = ViewModelProvider(requireActivity())[MainViewModel::class.java]
-        userModel = ViewModelProvider(requireActivity())[UserViewModel::class.java]
+        viewModel = ViewModelProvider(
+            requireActivity(),
+            ViewModelFactory(requireContext())
+        )[MainViewModel::class.java]
+        adapter = FoodAdapter(context, false, viewModel)
         val root: View = binding.root
         val categoryId = arguments?.getInt("viewId")
         var category = ""
+        var query = arguments?.getString("query")!!
+
         when (categoryId) {
             R.id.btn_category1 -> {
-                category = "ayam mati"
+                category = "Ayam"
             }
 
             R.id.btn_category2 -> {
-                category = "ikan"
+                category = "Ikan"
             }
 
             R.id.btn_category3 -> {
-                category = "telur"
+                category = "Telur"
             }
 
             R.id.btn_category4 -> {
-                category = "tahu"
+                category = "Kambing"
             }
 
             R.id.btn_category5 -> {
-                category = "udang"
+                category = "Tahu"
             }
 
             R.id.btn_category6 -> {
-                category = "tempe"
+                category = "Udang"
+            }
+
+            R.id.btn_category7 -> {
+                category = "Tempe"
+            }
+
+            R.id.btn_category8 -> {
+                category = "Sapi"
             }
         }
 
@@ -85,26 +93,64 @@ class FoodFragment : Fragment() {
         })
 
         with(binding) {
+            searchView.setupWithSearchBar(searchBar)
             recyclerView.layoutManager = LinearLayoutManager(requireContext())
             recyclerView.setHasFixedSize(true)
 
-            lifecycleScope.launch {
-                mainModel.getFoods(userModel.getToken())
+            if (query.isNotEmpty()) {
+                searchBar.setText(query)
+                viewModel.postSearch(query).observe(viewLifecycleOwner) {
+                    progressBar.visibility = View.GONE
+                    adapter.setList(it)
+                    recyclerView.adapter = adapter
+                }
+            } else {
+                viewModel.getFoods().observe(viewLifecycleOwner) {
+                    val list = it.filter { data -> data?.category == category }
+                    progressBar.visibility = View.GONE
+                    adapter.setList(list)
+                    recyclerView.adapter = adapter
+                }
             }
 
-            mainModel.foods.observe(requireActivity()) {
-                val list = it.filter { data -> data.category == category }
-                progressBar.visibility = View.GONE
-                adapter.setList(list)
-                recyclerView.adapter = adapter
-            }
-
-            searchView.setupWithSearchBar(searchBar)
             searchView.editText.setOnEditorActionListener { _, _, _ ->
                 searchBar.setText(searchView.text)
                 searchView.hide()
-                Toast.makeText(activity, searchView.text, Toast.LENGTH_SHORT).show()
-                false
+                query = searchView.text.toString()
+
+                if (query.isNotEmpty()) {
+                    if (category.isEmpty()) {
+                        viewModel.postSearch(query).observe(viewLifecycleOwner) {
+                            progressBar.visibility = View.GONE
+                            adapter.setList(it)
+                            recyclerView.adapter = adapter
+                        }
+                    } else {
+                        viewModel.postSearch(query).observe(viewLifecycleOwner) {
+                            val list = it.filter { data -> data?.category == category }
+                            progressBar.visibility = View.GONE
+                            adapter.setList(list)
+                            recyclerView.adapter = adapter
+                        }
+                    }
+                } else {
+                    if (category.isEmpty()) {
+                        viewModel.getFoods().observe(viewLifecycleOwner) {
+                            progressBar.visibility = View.GONE
+                            adapter.setList(it)
+                            recyclerView.adapter = adapter
+                        }
+                    } else {
+                        viewModel.getFoods().observe(viewLifecycleOwner) {
+                            val list = it.filter { data -> data?.category == category }
+                            progressBar.visibility = View.GONE
+                            adapter.setList(list)
+                            recyclerView.adapter = adapter
+                        }
+                    }
+                }
+
+                true
             }
         }
 

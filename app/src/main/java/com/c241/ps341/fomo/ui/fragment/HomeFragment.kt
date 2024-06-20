@@ -20,7 +20,6 @@ import android.view.Window
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.c241.ps341.fomo.R
@@ -29,10 +28,8 @@ import com.c241.ps341.fomo.api.response.FoodDataItem
 import com.c241.ps341.fomo.databinding.FragmentHomeBinding
 import com.c241.ps341.fomo.ui.activity.DetailActivity
 import com.c241.ps341.fomo.ui.activity.UploadActivity
-import com.c241.ps341.fomo.ui.model.HomeViewModel
-import com.c241.ps341.fomo.ui.model.UserViewModel
+import com.c241.ps341.fomo.ui.model.MainViewModel
 import com.c241.ps341.fomo.ui.model.ViewModelFactory
-import kotlinx.coroutines.launch
 
 @Suppress("DEPRECATION")
 class HomeFragment : Fragment() {
@@ -40,8 +37,7 @@ class HomeFragment : Fragment() {
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
     private lateinit var adapter: FoodAdapter
-    private lateinit var viewModel: HomeViewModel
-    private lateinit var userModel: UserViewModel
+    private lateinit var viewModel: MainViewModel
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreateView(
@@ -49,28 +45,16 @@ class HomeFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        requireActivity().window.decorView.systemUiVisibility =
+            View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+        requireActivity().window.statusBarColor = Color.TRANSPARENT
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
-        adapter = FoodAdapter(context, false)
-        viewModel = ViewModelProvider(requireActivity())[HomeViewModel::class.java]
-        userModel = ViewModelProvider(requireActivity(), ViewModelFactory(requireContext()))[UserViewModel::class.java]
-        activity?.window?.decorView?.systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-        activity?.window?.statusBarColor = Color.TRANSPARENT
+        viewModel = ViewModelProvider(
+            requireActivity(),
+            ViewModelFactory(requireContext())
+        )[MainViewModel::class.java]
+        adapter = FoodAdapter(context, false, viewModel)
         val root: View = binding.root
-
-        with(binding) {
-            recyclerView.layoutManager = LinearLayoutManager(requireContext())
-            recyclerView.setHasFixedSize(true)
-
-            lifecycleScope.launch {
-                viewModel.getFoods(userModel.getToken())
-            }
-
-            viewModel.foods.observe(requireActivity()) {
-                progressBar.visibility = View.GONE
-                adapter.setList(it)
-                recyclerView.adapter = adapter
-            }
-        }
 
         adapter.setOnItemClickCallBack(object :
             FoodAdapter.OnItemClickCallBack {
@@ -82,20 +66,28 @@ class HomeFragment : Fragment() {
                     it.putExtra("extra_steps", data.steps)
                     it.putExtra("extra_userid", data.userId)
                     it.putExtra("extra_id", data.id)
+                    it.putExtra("extra_rating", data.rating)
                     startActivity(it)
                 }
             }
         })
 
         with(binding) {
-            recyclerView.layoutManager = LinearLayoutManager(activity)
-            recyclerView.setHasFixedSize(true)
-            recyclerView.adapter = adapter
             searchView.setupWithSearchBar(searchBar)
+
             searchView.editText.setOnEditorActionListener { _, _, _ ->
                 searchBar.setText(searchView.text)
                 searchView.hide()
-                findNavController().navigate(R.id.action_start_to_result)
+                val query = searchView.text.toString().trim()
+
+                if (query.isNotEmpty()) {
+                    val bundle = Bundle().apply {
+                        putString("query", query)
+                    }
+
+                    findNavController().navigate(R.id.action_start_to_result, bundle)
+                }
+
                 true
             }
 
@@ -105,6 +97,16 @@ class HomeFragment : Fragment() {
             setCategoryOnClick(btnCategory4)
             setCategoryOnClick(btnCategory5)
             setCategoryOnClick(btnCategory6)
+            setCategoryOnClick(btnCategory7)
+            setCategoryOnClick(btnCategory8)
+            recyclerView.layoutManager = LinearLayoutManager(requireContext())
+            recyclerView.setHasFixedSize(true)
+
+            viewModel.getFoods().observe(viewLifecycleOwner) {
+                progressBar.visibility = View.GONE
+                adapter.setList(it)
+                recyclerView.adapter = adapter
+            }
 
             btnUpload.setOnClickListener {
                 if (ContextCompat.checkSelfPermission(
@@ -132,23 +134,31 @@ class HomeFragment : Fragment() {
                     resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
 
                 if (scrollY > 680) {
-                    activity?.window?.decorView?.systemUiVisibility =
-                        View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or
-                                if (!isDarkMode) View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR else 0
+                    requireActivity().window.decorView.systemUiVisibility =
+                        View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or if (!isDarkMode) View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR else 0
+
                     if (isDarkMode) {
-                        animateStatusBarColorChange(activity?.window, Color.parseColor("#121212"))
+                        animateStatusBarColorChange(
+                            requireActivity().window,
+                            Color.parseColor("#121212")
+                        )
                     } else {
-                        animateStatusBarColorChange(activity?.window, Color.WHITE)
+                        animateStatusBarColorChange(requireActivity().window, Color.WHITE)
                     }
                 } else {
-                    activity?.window?.decorView?.systemUiVisibility =
+                    requireActivity().window.decorView.systemUiVisibility =
                         View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                    animateStatusBarColorChange(activity?.window, Color.TRANSPARENT)
+                    animateStatusBarColorChange(requireActivity().window, Color.TRANSPARENT)
                 }
             }
         }
 
         return root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     @Deprecated("Deprecated in Java")
@@ -161,15 +171,8 @@ class HomeFragment : Fragment() {
         if (requestCode == 1) {
             if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
                 showOptions()
-            } else {
-                // Handle permission denied case
             }
         }
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
     }
 
     @Deprecated("Deprecated in Java")
@@ -179,7 +182,7 @@ class HomeFragment : Fragment() {
             val imageUri: Uri? = data?.data
             if (imageUri != null) {
                 val intent = Intent(activity, UploadActivity::class.java)
-                intent.putExtra("imageUri", imageUri.toString())
+                intent.putExtra("extra_uri", imageUri.toString())
                 startActivity(intent)
             } else {
                 val extras = data?.extras
@@ -193,7 +196,7 @@ class HomeFragment : Fragment() {
                     )
                     val uri = Uri.parse(path)
                     val intent = Intent(activity, UploadActivity::class.java)
-                    intent.putExtra("imageUri", uri.toString())
+                    intent.putExtra("extra_uri", uri.toString())
                     startActivity(intent)
                 }
             }
@@ -204,7 +207,9 @@ class HomeFragment : Fragment() {
         view.setOnClickListener {
             val bundle = Bundle().apply {
                 putInt("viewId", view.id)
+                putString("query", "")
             }
+
             findNavController().navigate(R.id.action_start_to_result, bundle)
         }
     }
@@ -220,14 +225,16 @@ class HomeFragment : Fragment() {
         startActivityForResult(chooser, 1)
     }
 
-    private fun animateStatusBarColorChange(window: Window?, toColor: Int) {
-        window?.let {
+    private fun animateStatusBarColorChange(window: Window, toColor: Int) {
+        window.let {
             val fromColor = it.statusBarColor
             val colorAnimation = ValueAnimator.ofObject(ArgbEvaluator(), fromColor, toColor)
             colorAnimation.duration = 300
+
             colorAnimation.addUpdateListener { animator ->
                 it.statusBarColor = animator.animatedValue as Int
             }
+
             colorAnimation.start()
         }
     }

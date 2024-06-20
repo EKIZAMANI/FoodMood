@@ -15,7 +15,6 @@ import android.text.method.HideReturnsTransformationMethod
 import android.text.method.LinkMovementMethod
 import android.text.method.PasswordTransformationMethod
 import android.text.style.ClickableSpan
-import android.text.style.ForegroundColorSpan
 import android.util.Log
 import android.view.View
 import android.widget.Toast
@@ -27,10 +26,11 @@ import androidx.credentials.GetCredentialResponse
 import androidx.credentials.exceptions.GetCredentialException
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import com.c241.ps341.fomo.BuildConfig
 import com.c241.ps341.fomo.data.UserData
 import com.c241.ps341.fomo.data.repository.UserRepository
 import com.c241.ps341.fomo.databinding.ActivityLoginBinding
-import com.c241.ps341.fomo.ui.model.UserViewModel
+import com.c241.ps341.fomo.ui.model.MainViewModel
 import com.c241.ps341.fomo.ui.model.ViewModelFactory
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
@@ -47,31 +47,23 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.database
-import com.c241.ps341.fomo.BuildConfig
 import kotlinx.coroutines.launch
 import java.security.MessageDigest
 
 class LoginActivity : AppCompatActivity() {
     private lateinit var binding: ActivityLoginBinding
     private lateinit var auth: FirebaseAuth
-    private lateinit var userModel: UserViewModel
     private lateinit var db: FirebaseDatabase
+    private lateinit var viewModel: MainViewModel
     private var showPassword = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityLoginBinding.inflate(layoutInflater)
-        userModel = ViewModelProvider(
-            this,
-            ViewModelFactory(this@LoginActivity)
-        )[UserViewModel::class.java]
         FirebaseApp.initializeApp(this)
+        binding = ActivityLoginBinding.inflate(layoutInflater)
         auth = Firebase.auth
         db = Firebase.database
-        val userRef = db.reference.child("user")
-        val currentUser = auth.currentUser
-        loginCheck(currentUser)
-//        updateUI(currentUser)
+        viewModel = ViewModelProvider(this, ViewModelFactory(this))[MainViewModel::class.java]
 
         with(binding) {
             setContentView(root)
@@ -137,66 +129,11 @@ class LoginActivity : AppCompatActivity() {
             }
 
             btnLogin.setOnClickListener {
-                val progressDialog = ProgressDialog.show(this@LoginActivity, null, "Harap tunggu")
-                auth.signInWithEmailAndPassword(etEmail.text.toString(), etPassword.text.toString())
-                    .addOnCompleteListener(this@LoginActivity) { task ->
-                        if (task.isSuccessful) {
-                            val query =
-                                userRef.orderByChild("email").equalTo(etEmail.text.toString())
-
-                            query.addListenerForSingleValueEvent(object : ValueEventListener {
-                                override fun onDataChange(dataSnapshot: DataSnapshot) {
-                                    progressDialog.dismiss()
-                                    if (dataSnapshot.exists()) {
-                                        for (userSnapshot in dataSnapshot.children) {
-                                            val user = userSnapshot.getValue(UserData::class.java)
-                                            val password = hashPassword(etPassword.text.toString())
-
-                                            if (user?.password == password) {
-                                                auth.currentUser?.uid?.let { it1 ->
-                                                    userModel.setId(it1)
-                                                }
-
-                                                user.name?.let { it1 -> userModel.setName(it1) }
-                                                user.email?.let { it1 -> userModel.setEmail(it1) }
-                                                user.photoUrl?.let { it1 -> userModel.setPhoto(it1) }
-                                                startActivity(
-                                                    Intent(
-                                                        this@LoginActivity,
-                                                        MainActivity::class.java
-                                                    )
-                                                )
-                                                finish()
-                                            }
-                                        }
-                                    }
-                                }
-
-                                override fun onCancelled(databaseError: DatabaseError) {
-                                    progressDialog.dismiss()
-                                    Toast.makeText(
-                                        this@LoginActivity,
-                                        "Database error",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                    Log.e(
-                                        "FirebaseDatabase",
-                                        "Database error: ${databaseError.message}"
-                                    )
-                                }
-                            })
-                        } else {
-                            progressDialog.dismiss()
-                            Toast.makeText(
-                                baseContext, "Akun tersebut belum terdaftar",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
-                    }
+                login(etEmail.text.toString(), etPassword.text.toString())
             }
 
             btnGoogle.setOnClickListener {
-                signIn()
+                loginWithGoogle()
             }
 
             val text = "if you don’t an account you can Register here!"
@@ -225,13 +162,14 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-    private fun signIn() {
+    private fun loginWithGoogle() {
         val credentialManager = CredentialManager.create(this)
-        val googleIdOption = GetGoogleIdOption.Builder()
+        val googleIdOption = GetGoogleIdOption
+            .Builder()
             .setFilterByAuthorizedAccounts(false)
-            .setServerClientId(BuildConfig.CLIENT_ID)
-            .build()
-        val request = GetCredentialRequest.Builder()
+            .setServerClientId(BuildConfig.CLIENT_ID).build()
+        val request = GetCredentialRequest
+            .Builder()
             .addCredentialOption(googleIdOption)
             .build()
 
@@ -241,68 +179,97 @@ class LoginActivity : AppCompatActivity() {
                     request = request,
                     context = this@LoginActivity,
                 )
-                handleSignIn(result)
+                when (val credential = result.credential) {
+                    is CustomCredential -> {
+                        if (credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
+                            try {
+                                val googleIdTokenCredential =
+                                    GoogleIdTokenCredential.createFrom(credential.data)
+                                authWithGoogle(googleIdTokenCredential.idToken)
+                            } catch (e: GoogleIdTokenParsingException) {
+                                e.printStackTrace()
+                            }
+                        }
+                    }
+                }
             } catch (e: GetCredentialException) {
                 e.printStackTrace()
             }
         }
     }
 
-    private fun handleSignIn(result: GetCredentialResponse) {
-        when (val credential = result.credential) {
-            is CustomCredential -> {
-                if (credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
-                    try {
-                        val googleIdTokenCredential =
-                            GoogleIdTokenCredential.createFrom(credential.data)
-                        firebaseAuthWithGoogle(googleIdTokenCredential.idToken)
-                    } catch (e: GoogleIdTokenParsingException) {
-                        e.printStackTrace()
-                    }
-                }
-            }
-        }
-    }
-
-    private fun firebaseAuthWithGoogle(idToken: String) {
+    private fun authWithGoogle(idToken: String) {
         val credential: AuthCredential = GoogleAuthProvider.getCredential(idToken, null)
         auth.signInWithCredential(credential)
-            .addOnCompleteListener(this) { task ->
-                if (task.isSuccessful) {
+            .addOnCompleteListener(this) {
+                if (it.isSuccessful) {
                     val user: FirebaseUser? = auth.currentUser
                     val userRepository = UserRepository()
-                    val password = hashPassword("FOMO_google")
+                    val password = hashPassword("FOMO_google_${user!!.uid}")
                     userRepository.createUser(
-                        user!!.uid,
+                        user.uid,
                         user.displayName.toString(),
                         password,
                         user.email.toString(),
                         user.photoUrl.toString()
                     )
-                    updateUI(user)
-                } else {
-                    updateUI(null)
+                    setCurrentUser(user)
                 }
             }
     }
 
-    private fun updateUI(currentUser: FirebaseUser?) {
-        if (currentUser != null) {
-            userModel.setId(currentUser.uid)
-            currentUser.displayName?.let { userModel.setName(it) }
-            currentUser.email?.let { userModel.setEmail(it) }
-            currentUser.photoUrl?.let { userModel.setPhoto(it.toString()) }
-            startActivity(Intent(this@LoginActivity, MainActivity::class.java))
-            finish()
+    private fun login(email: String, password: String) {
+        val progressDialog = ProgressDialog.show(this, null, "Harap tunggu")
+        auth.signInWithEmailAndPassword(email, password).addOnCompleteListener(this) {
+            if (it.isSuccessful) {
+                val userRef = db.reference.child("user")
+                val query = userRef.orderByChild("email").equalTo(email)
+
+                query.addListenerForSingleValueEvent(object : ValueEventListener {
+                    override fun onDataChange(dataSnapshot: DataSnapshot) {
+                        progressDialog.dismiss()
+
+                        if (dataSnapshot.exists()) {
+                            for (userSnapshot in dataSnapshot.children) {
+                                val user = userSnapshot.getValue(UserData::class.java)
+
+                                if (user?.password == hashPassword(password)) {
+                                    auth.currentUser?.uid?.let { it1 ->
+                                        viewModel.setId(it1)
+                                    }
+
+                                    user.name?.let { it1 -> viewModel.setName(it1) }
+                                    user.email?.let { it1 -> viewModel.setEmail(it1) }
+                                    user.photoUrl?.let { it1 -> viewModel.setPhoto(it1) }
+                                    setCurrentUser(auth.currentUser)
+                                }
+                            }
+                        }
+                    }
+
+                    override fun onCancelled(databaseError: DatabaseError) {
+                        progressDialog.dismiss()
+                        Toast.makeText(
+                            this@LoginActivity,
+                            "Database error",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                })
+            } else {
+                progressDialog.dismiss()
+                Toast.makeText(this, "Email atau password tidak cocok", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
-    private fun loginCheck(currentUser: FirebaseUser?) {
+    private fun setCurrentUser(currentUser: FirebaseUser?) {
         if (currentUser != null) {
-            Intent(this, MainActivity::class.java).also {
-                startActivity(it)
-                finish()
-            }
+            viewModel.setId(currentUser.uid)
+            currentUser.displayName?.let { value -> viewModel.setName(value) }
+            currentUser.email?.let { value -> viewModel.setEmail(value) }
+            currentUser.photoUrl?.let { value -> viewModel.setPhoto(value.toString()) }
+            SplashActivity().generateToken(this, auth, viewModel)
         }
     }
 

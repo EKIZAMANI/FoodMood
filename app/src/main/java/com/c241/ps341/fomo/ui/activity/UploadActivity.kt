@@ -8,21 +8,32 @@ import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Log
 import android.widget.ArrayAdapter
-import android.widget.AutoCompleteTextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.ViewModelProvider
 import com.c241.ps341.fomo.R
 import com.c241.ps341.fomo.databinding.ActivityUploadBinding
+import com.c241.ps341.fomo.ui.model.MainViewModel
+import com.c241.ps341.fomo.ui.model.ViewModelFactory
+import java.io.File
+import java.io.FileOutputStream
+import java.io.InputStream
 
 @Suppress("DEPRECATION")
 class UploadActivity : AppCompatActivity() {
     private lateinit var binding: ActivityUploadBinding
+    private lateinit var viewModel: MainViewModel
+    private var categorySelected: String = "none"
+    private var currentImage = ""
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityUploadBinding.inflate(layoutInflater)
+        viewModel = ViewModelProvider(this, ViewModelFactory(this))[MainViewModel::class.java]
 
         with(binding) {
             setContentView(root)
@@ -31,7 +42,7 @@ class UploadActivity : AppCompatActivity() {
                 finish()
             }
 
-            ivImage.setImageURI(Uri.parse(intent.getStringExtra("imageUri")))
+            ivImage.setImageURI(Uri.parse(intent.getStringExtra("extra_uri")))
 
             ivImage.setOnClickListener {
                 if (ContextCompat.checkSelfPermission(
@@ -56,25 +67,66 @@ class UploadActivity : AppCompatActivity() {
                 }
             }
 
-            btnSubmit.setOnClickListener {
-                Toast.makeText(
-                    this@UploadActivity,
-                    "The form has been uploaded",
-                    Toast.LENGTH_SHORT
-                ).show()
-                finish()
-                startActivity(Intent(this@UploadActivity, DetailActivity::class.java))
-            }
-            val languages = resources.getStringArray(R.array.food_category)
-            // create an array adapter and pass the required parameter
-            // in our case pass the context, drop down layout , and array.
-            val arrayAdapter = ArrayAdapter(this@UploadActivity, R.layout.dropdown_item, languages)
-            // get reference to the autocomplete text view
-            val autocompleteTV = findViewById<AutoCompleteTextView>(R.id.autoCompleteTextView)
-            // set adapter to the autocomplete tv to the arrayAdapter
-            autocompleteTV.setAdapter(arrayAdapter)
-        }
+            val category =
+                listOf("Ayam", "Ikan", "Kambing", "Sapi", "Tahu", "Telur", "Tempe", "Udang")
+            val arrayAdapter = ArrayAdapter(this@UploadActivity, R.layout.dropdown_item, category)
+            tvCategory.setAdapter(arrayAdapter)
 
+            tvCategory.setOnItemClickListener { _, _, i, _ ->
+                categorySelected = category[i]
+            }
+
+            btnSubmit.setOnClickListener {
+                val name = etName.text.toString()
+                val ingredient = etIngredient.text.toString()
+                val step = etDescription.text.toString()
+
+                viewModel.postFood(name, ingredient, step, categorySelected).observe(this@UploadActivity) {
+                    if (viewModel.foodPostMsg() == "create new food success") {
+                        val imageUri = intent.getStringExtra("extra_uri")
+                        Log.i("mgrlog", imageUri.toString())
+                        val inputStream: InputStream? =
+                            contentResolver.openInputStream(Uri.parse(imageUri))
+                        val file = File(cacheDir, "upload_image.jpg")
+                        val outputStream = FileOutputStream(file)
+
+                        inputStream?.use { input ->
+                            outputStream.use { output ->
+                                input.copyTo(output)
+                            }
+                        }
+
+                        viewModel.patchFood(file).observe(this@UploadActivity) { it1 ->
+                            if (it1 == "Update Food Success") {
+                                Toast.makeText(
+                                    this@UploadActivity,
+                                    "The form has been uploaded",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+
+                                Intent(this@UploadActivity, DetailActivity::class.java).also { intent ->
+                                    intent.putExtra("extra_foodname", name)
+                                    intent.putExtra("extra_image", imageUri)
+                                    intent.putExtra("extra_ingredients", ingredient)
+                                    intent.putExtra("extra_steps", step)
+                                    intent.putExtra("extra_userid", viewModel.getId())
+                                    intent.putExtra("extra_id", viewModel.foodId())
+                                    intent.putExtra("extra_rating", it?.rating)
+                                    startActivity(intent)
+                                }
+
+                                finish()
+                            } else {
+                                Toast.makeText(this@UploadActivity, "Error", Toast.LENGTH_SHORT)
+                                    .show()
+                            }
+                        }
+                    } else {
+                        Toast.makeText(this@UploadActivity, "Error", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        }
     }
 
     override fun onRequestPermissionsResult(
@@ -96,8 +148,9 @@ class UploadActivity : AppCompatActivity() {
         if (resultCode == Activity.RESULT_OK && requestCode == 1) {
             val imageUri: Uri? = data?.data
             if (imageUri != null) {
+                currentImage = imageUri.toString()
                 val intent = Intent(applicationContext, UploadActivity::class.java)
-                intent.putExtra("imageUri", imageUri.toString())
+                intent.putExtra("extra_uri", imageUri.toString())
                 startActivity(intent)
                 finish()
             } else {
@@ -111,8 +164,9 @@ class UploadActivity : AppCompatActivity() {
                         null
                     )
                     val uri = Uri.parse(path)
+                    currentImage = path
                     val intent = Intent(applicationContext, UploadActivity::class.java)
-                    intent.putExtra("imageUri", uri.toString())
+                    intent.putExtra("extra_uri", uri.toString())
                     startActivity(intent)
                     finish()
                 }

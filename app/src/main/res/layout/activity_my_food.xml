@@ -46,11 +46,36 @@
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerView"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingTop="20dp"
-        tools:ignore="MissingConstraints"
-        tools:listitem="@layout/item_myfood" />
+        android:layout_height="wrap_content">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="20dp"
+            tools:ignore="MissingConstraints"
+            tools:listitem="@layout/item_myfood" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ProgressBar
+                android:id="@+id/progress_bar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true" />
+
+            <TextView
+                android:id="@+id/tv_empty"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:fontFamily="@font/poppins"
+                android:text="Item tidak tersedia"
+                android:visibility="gone" />
+        </RelativeLayout>
+    </RelativeLayout>
 </LinearLayout>

@@ -197,37 +197,37 @@ class RegisterActivity : AppCompatActivity() {
                     ""
                 )
 
-                userRef.push().setValue(data) { error, _ ->
-                    if (error != null) {
-                        progressDialog.dismiss()
-                        Toast.makeText(
-                            this@RegisterActivity,
-                            "Gagal mendaftar akun",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                        Log.e("mgrlog", error.message)
-                    } else {
-                        auth.createUserWithEmailAndPassword(
-                            etEmail.text.toString(),
-                            etPassword.text.toString()
-                        ).addOnCompleteListener(this@RegisterActivity) {
-                            progressDialog.dismiss()
-                            if (it.isSuccessful) {
+                auth.createUserWithEmailAndPassword(
+                    etEmail.text.toString(),
+                    etPassword.text.toString()
+                ).addOnCompleteListener(this@RegisterActivity) {
+                    progressDialog.dismiss()
+                    if (it.isSuccessful) {
+                        userRef.child(auth.currentUser?.uid!!).setValue(data) { error, _ ->
+                            if (error != null) {
+                                progressDialog.dismiss()
+                                Toast.makeText(
+                                    this@RegisterActivity,
+                                    "Gagal mendaftar akun",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                                Log.e("mgrlog", error.message)
+                            } else {
                                 Toast.makeText(
                                     this@RegisterActivity,
                                     "Daftar akun berhasil",
                                     Toast.LENGTH_SHORT
                                 ).show()
                                 finish()
-                            } else {
-                                Toast.makeText(
-                                    this@RegisterActivity,
-                                    "Gagal mendaftar akun",
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                                Log.e("mgrlog", it.exception.toString())
                             }
                         }
+                    } else {
+                        Toast.makeText(
+                            this@RegisterActivity,
+                            "Gagal mendaftar akun",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        Log.e("mgrlog", it.exception.toString())
                     }
                 }
             }

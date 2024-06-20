@@ -13,15 +13,16 @@
         android:gravity="center_vertical"
         android:orientation="vertical">
 
-
         <TextView
+            android:id="@+id/tv_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="@font/poppins_semibold"
             android:textStyle="bold"
             tools:text="Nama" />
+
         <RatingBar
-            android:id="@+id/rtbHighScore"
+            android:id="@+id/rb_star"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginRight="45dp"
@@ -29,9 +30,10 @@
             android:max="100"
             android:rating="0.0"
             android:stepSize="0.0"
-            style="?android:attr/ratingBarStyleSmall"
-            />
+            style="?android:attr/ratingBarStyleSmall" />
+
         <TextView
+            android:id="@+id/tv_description"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="@font/poppins_light"
@@ -39,5 +41,4 @@
             android:justificationMode="inter_word"
             tools:text="komentar blabla blasda sdasd asdasdasda sdasd asda sda" />
     </LinearLayout>
-
 </LinearLayout>

@@ -29,7 +29,7 @@ import com.c241.ps341.fomo.databinding.FragmentProfileBinding
 import com.c241.ps341.fomo.ui.activity.EditActivity
 import com.c241.ps341.fomo.ui.activity.LoginActivity
 import com.c241.ps341.fomo.ui.activity.MyFoodActivity
-import com.c241.ps341.fomo.ui.model.UserViewModel
+import com.c241.ps341.fomo.ui.model.MainViewModel
 import com.c241.ps341.fomo.ui.model.ViewModelFactory
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
@@ -46,7 +46,7 @@ class ProfileFragment : Fragment() {
     private var _binding: FragmentProfileBinding? = null
     private val binding get() = _binding!!
     private lateinit var auth: FirebaseAuth
-    private lateinit var userModel: UserViewModel
+    private lateinit var viewModel: MainViewModel
     private lateinit var db: FirebaseDatabase
     private lateinit var storage: FirebaseStorage
 
@@ -56,10 +56,10 @@ class ProfileFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentProfileBinding.inflate(inflater, container, false)
-        userModel = ViewModelProvider(
+        viewModel = ViewModelProvider(
             requireActivity(),
             ViewModelFactory(requireContext())
-        )[UserViewModel::class.java]
+        )[MainViewModel::class.java]
         requireActivity().window.decorView.systemUiVisibility =
             View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
         requireActivity().window.statusBarColor = Color.TRANSPARENT
@@ -70,23 +70,21 @@ class ProfileFragment : Fragment() {
         storage = Firebase.storage
 
         with(binding) {
-            lifecycleScope.launch {
-                tvName.text = userModel.getName()
-                tvEmail.text = userModel.getEmail()
+            tvName.text = viewModel.getName()
+            tvEmail.text = viewModel.getEmail()
 
-                if (userModel.getPhoto().isNotEmpty()) {
-                    Glide.with(requireActivity())
-                        .load(Uri.parse(userModel.getPhoto()))
-                        .transition(DrawableTransitionOptions.withCrossFade())
-                        .centerCrop()
-                        .into(ivPhoto)
-                } else {
-                    Glide.with(requireActivity())
-                        .load(R.drawable.ic_user)
-                        .transition(DrawableTransitionOptions.withCrossFade())
-                        .centerCrop()
-                        .into(ivPhoto)
-                }
+            if (viewModel.getPhoto().isNotEmpty()) {
+                Glide.with(requireActivity())
+                    .load(Uri.parse(viewModel.getPhoto()))
+                    .transition(DrawableTransitionOptions.withCrossFade())
+                    .centerCrop()
+                    .into(ivPhoto)
+            } else {
+                Glide.with(requireActivity())
+                    .load(R.drawable.ic_user)
+                    .transition(DrawableTransitionOptions.withCrossFade())
+                    .centerCrop()
+                    .into(ivPhoto)
             }
 
             ivPhoto.setOnClickListener {
@@ -193,41 +191,39 @@ class ProfileFragment : Fragment() {
     }
 
     private fun updatePhoto(uri: Uri) {
-        lifecycleScope.launch {
-            val id = userModel.getId()
-            val progressDialog = ProgressDialog.show(requireContext(), null, "Harap tunggu")
-            val storageRef = storage.reference
-            val photoRef = storageRef.child("photos/${id}")
-            val uploadTask = photoRef.putFile(uri)
+        val id = viewModel.getId()
+        val progressDialog = ProgressDialog.show(requireContext(), null, "Harap tunggu")
+        val storageRef = storage.reference
+        val photoRef = storageRef.child("photos/${id}")
+        val uploadTask = photoRef.putFile(uri)
 
-            uploadTask.addOnSuccessListener {
-                photoRef.downloadUrl.addOnSuccessListener { uri ->
-                    val photoUrl = uri.toString()
-                    val userRef = db.reference.child("user").child(id)
-                    val user = mapOf("photoUrl" to photoUrl)
+        uploadTask.addOnSuccessListener {
+            photoRef.downloadUrl.addOnSuccessListener { uri ->
+                val photoUrl = uri.toString()
+                val userRef = db.reference.child("user").child(id)
+                val user = mapOf("photoUrl" to photoUrl)
 
-                    userRef.updateChildren(user).addOnCompleteListener { task ->
-                        progressDialog.dismiss()
+                userRef.updateChildren(user).addOnCompleteListener { task ->
+                    progressDialog.dismiss()
 
-                        if (task.isSuccessful) {
-                            userModel.setPhoto(photoUrl)
-                            Glide.with(requireActivity())
-                                .load(Uri.parse(photoUrl))
-                                .transition(DrawableTransitionOptions.withCrossFade())
-                                .centerCrop()
-                                .into(binding.ivPhoto)
-                            Toast.makeText(
-                                requireContext(),
-                                "Photo updated successfully",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        } else {
-                            Toast.makeText(
-                                requireContext(),
-                                "Failed to update photo",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
+                    if (task.isSuccessful) {
+                        viewModel.setPhoto(photoUrl)
+                        Glide.with(requireActivity())
+                            .load(Uri.parse(photoUrl))
+                            .transition(DrawableTransitionOptions.withCrossFade())
+                            .centerCrop()
+                            .into(binding.ivPhoto)
+                        Toast.makeText(
+                            requireContext(),
+                            "Photo updated successfully",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    } else {
+                        Toast.makeText(
+                            requireContext(),
+                            "Failed to update photo",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
                 }
             }
