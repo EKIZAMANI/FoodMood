@@ -129,12 +129,6 @@
                         tools:layout_editor_absoluteX="320dp"
                         tools:layout_editor_absoluteY="0dp">
 
-                        <ProgressBar
-                            android:id="@+id/progress_bar"
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:layout_margin="10dp"/>
-
                         <ImageView
                             android:id="@+id/iv_bookmark"
                             style="@style/CustomImageView"
@@ -212,12 +206,37 @@
                         android:text="Komentar"
                         android:textSize="16dp" />
 
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/recyclerView"
+                    <RelativeLayout
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        tools:ignore="MissingConstraints"
-                        tools:listitem="@layout/item_comment" />
+                        android:layout_height="wrap_content">
+
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/recyclerView"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            tools:ignore="MissingConstraints"
+                            tools:listitem="@layout/item_comment" />
+
+                        <RelativeLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent">
+
+                            <ProgressBar
+                                android:id="@id/progress_bar"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_centerInParent="true"/>
+
+                            <TextView
+                                android:id="@+id/tv_empty"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_centerInParent="true"
+                                android:fontFamily="@font/poppins"
+                                android:text="Postingan ini belum ada komentar"
+                                android:visibility="gone" />
+                        </RelativeLayout>
+                    </RelativeLayout>
 
                     <Button
                         android:id="@+id/btn_submit"

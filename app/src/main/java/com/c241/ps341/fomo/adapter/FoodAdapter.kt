@@ -136,6 +136,7 @@ class FoodAdapter(private val context: Context?, private var isBookmark: Boolean
                         }
                     }
                 }
+
                 tvTitle.text = data?.foodName
                 tvBookmark.text = formatBookmarkCount(data?.bookmarkCounts!!)
             }

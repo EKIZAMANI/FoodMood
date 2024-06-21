@@ -17,6 +17,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -24,6 +25,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.c241.ps341.fomo.R
 import com.c241.ps341.fomo.adapter.FoodAdapter
+import com.c241.ps341.fomo.adapter.MyFoodAdapter
 import com.c241.ps341.fomo.api.response.FoodDataItem
 import com.c241.ps341.fomo.databinding.FragmentHomeBinding
 import com.c241.ps341.fomo.ui.activity.DetailActivity
@@ -38,6 +40,16 @@ class HomeFragment : Fragment() {
     private val binding get() = _binding!!
     private lateinit var adapter: FoodAdapter
     private lateinit var viewModel: MainViewModel
+
+    private val editItemLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            viewModel.getFoods().observe(viewLifecycleOwner) {
+                binding.progressBar.visibility = View.GONE
+                adapter.setList(it)
+                binding.recyclerView.adapter = adapter
+            }
+        }
+    }
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreateView(
@@ -67,7 +79,8 @@ class HomeFragment : Fragment() {
                     it.putExtra("extra_userid", data.userId)
                     it.putExtra("extra_id", data.id)
                     it.putExtra("extra_rating", data.rating)
-                    startActivity(it)
+                    it.putExtra("extra_category", data.category)
+                    editItemLauncher.launch(it)
                 }
             }
         })
@@ -183,7 +196,7 @@ class HomeFragment : Fragment() {
             if (imageUri != null) {
                 val intent = Intent(activity, UploadActivity::class.java)
                 intent.putExtra("extra_uri", imageUri.toString())
-                startActivity(intent)
+                editItemLauncher.launch(intent)
             } else {
                 val extras = data?.extras
                 val imageBitmap = extras?.get("data") as? Bitmap
@@ -197,7 +210,7 @@ class HomeFragment : Fragment() {
                     val uri = Uri.parse(path)
                     val intent = Intent(activity, UploadActivity::class.java)
                     intent.putExtra("extra_uri", uri.toString())
-                    startActivity(intent)
+                    editItemLauncher.launch(intent)
                 }
             }
         }
