@@ -37,7 +37,9 @@ class EditActivity : AppCompatActivity() {
             etEmail.setText(email)
 
             btnSubmit.setOnClickListener {
-                updateProfile(etName.text.toString())
+                val newName = etName.text.toString()
+                if (newName.isNotEmpty()) updateProfile(etName.text.toString())
+                else Toast.makeText(this@EditActivity, "Harap isi bidang yang kosong", Toast.LENGTH_SHORT).show()
             }
 
             ivBack.setOnClickListener {

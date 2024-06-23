@@ -36,12 +36,14 @@ class DetailActivity : AppCompatActivity() {
             if (result.resultCode == Activity.RESULT_OK) {
                 val id = intent.getIntExtra("extra_id", 0)
                 setComment(id)
+                binding.btnSubmit.visibility = View.GONE
             }
         }
 
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setResult(Activity.RESULT_OK)
         window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
         window.statusBarColor = Color.TRANSPARENT
         binding = ActivityDetailBinding.inflate(layoutInflater)
@@ -129,6 +131,7 @@ class DetailActivity : AppCompatActivity() {
                                 progressDialog.dismiss()
 
                                 if (value == "delete Food success") {
+                                    setResult(Activity.RESULT_OK)
                                     Toast.makeText(
                                         this@DetailActivity,
                                         "Your recipe has been deleted",
@@ -142,7 +145,6 @@ class DetailActivity : AppCompatActivity() {
                                         Toast.LENGTH_SHORT
                                     ).show()
                                 }
-
                             }
                         }.setNegativeButton("TIDAK") { dialogInterface, _ ->
                             dialogInterface.dismiss()
@@ -151,6 +153,7 @@ class DetailActivity : AppCompatActivity() {
                 }
             } else {
                 viewModel.getBookmarks().observe(this@DetailActivity) {
+                    pbBookmark.visibility = View.GONE
                     val myBookmark = it.filter { data -> data?.userId == viewModel.getId() }
                     val checkBookmark = myBookmark.filter { data -> data?.foodId == id }
                     ivBookmark.visibility = View.VISIBLE
@@ -163,9 +166,13 @@ class DetailActivity : AppCompatActivity() {
 
                 btnBookmark.setOnClickListener {
                     isBookmark = !isBookmark
+                    val progressDialog =
+                        ProgressDialog.show(this@DetailActivity, null, "Harap tunggu")
 
                     if (isBookmark) {
                         viewModel.postBookmark(id).observe(this@DetailActivity) {
+                            progressDialog.dismiss()
+
                             if (it == "Create new bookmark success") {
                                 ivBookmark.setImageResource(R.drawable.ic_bookmark2_on)
                                 setResult(Activity.RESULT_OK)
@@ -191,6 +198,8 @@ class DetailActivity : AppCompatActivity() {
 
                             viewModel.deleteBookmark(foodId[0]!!)
                                 .observe(this@DetailActivity) { it1 ->
+                                    progressDialog.dismiss()
+
                                     if (it1 == "Delete bookmark success") {
                                         ivBookmark.setImageResource(R.drawable.ic_bookmark2_off)
                                         setResult(Activity.RESULT_OK)
@@ -216,13 +225,6 @@ class DetailActivity : AppCompatActivity() {
             recyclerView.layoutManager = LinearLayoutManager(this@DetailActivity)
             recyclerView.setHasFixedSize(true)
             setComment(id)
-            progressBar.visibility = View.GONE
-
-            if (adapter.itemCount == 0 && progressBar.visibility == View.GONE) {
-                tvEmpty.visibility = View.VISIBLE
-            } else {
-                tvEmpty.visibility = View.GONE
-            }
 
             btnSubmit.setOnClickListener {
                 Intent(this@DetailActivity, CommentActivity::class.java).also {
@@ -258,23 +260,21 @@ class DetailActivity : AppCompatActivity() {
                 val list = it.filter { data -> data?.foodId == id }
                 val myRating = list.filter { data -> data?.userId == viewModel.getId() }
 
-                if (myRating.isNotEmpty()) {
-                    btnSubmit.visibility = View.GONE
+                if (myRating.isEmpty()) {
+                    btnSubmit.visibility = View.VISIBLE
+                }
+
+                if (list.isEmpty()) {
+                    progressBar.visibility = View.GONE
+                    tvEmpty.visibility = View.VISIBLE
+                } else {
+                    tvEmpty.visibility = View.GONE
                 }
 
                 viewModel.getComments().observe(this@DetailActivity) { it1 ->
                     val filterId = it1.filter { data -> data?.foodId == id }
 
                     list.forEach { value ->
-                        tvEmpty.visibility = View.VISIBLE
-                        progressBar.visibility = View.VISIBLE
-
-                        if (adapter.itemCount == 0 && progressBar.visibility == View.GONE) {
-                            tvEmpty.visibility = View.VISIBLE
-                        } else {
-                            tvEmpty.visibility = View.GONE
-                        }
-
                         val list1 = filterId.filter { data -> data?.userId == value?.userId }
 
                         if (list1.isNotEmpty()) {
@@ -287,15 +287,9 @@ class DetailActivity : AppCompatActivity() {
                                             value1?.commentField!!
                                         )
                                     )
-
                                     progressBar.visibility = View.GONE
                                     adapter.setList(data)
-
-                                    if (adapter.itemCount == 0 && progressBar.visibility == View.GONE) {
-                                        tvEmpty.visibility = View.VISIBLE
-                                    } else {
-                                        tvEmpty.visibility = View.GONE
-                                    }
+                                    recyclerView.adapter = adapter
                                 }
                             }
                         } else {
@@ -307,20 +301,12 @@ class DetailActivity : AppCompatActivity() {
                                         ""
                                     )
                                 )
-
                                 progressBar.visibility = View.GONE
                                 adapter.setList(data)
-
-                                if (adapter.itemCount == 0 && progressBar.visibility == View.GONE) {
-                                    tvEmpty.visibility = View.VISIBLE
-                                } else {
-                                    tvEmpty.visibility = View.GONE
-                                }
+                                recyclerView.adapter = adapter
                             }
                         }
                     }
-
-                    recyclerView.adapter = adapter
                 }
             }
         }

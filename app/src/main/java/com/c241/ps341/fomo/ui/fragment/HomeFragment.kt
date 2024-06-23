@@ -98,7 +98,11 @@ class HomeFragment : Fragment() {
                         putString("query", query)
                     }
 
-                    findNavController().navigate(R.id.action_start_to_result, bundle)
+                    val currentDestination = findNavController().currentDestination
+
+                    if (currentDestination?.id == R.id.navigation_home) {
+                        findNavController().navigate(R.id.action_start_to_result, bundle)
+                    }
                 }
 
                 true
@@ -151,17 +155,14 @@ class HomeFragment : Fragment() {
                         View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or if (!isDarkMode) View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR else 0
 
                     if (isDarkMode) {
-                        animateStatusBarColorChange(
-                            requireActivity().window,
-                            Color.parseColor("#121212")
-                        )
+                        requireActivity().window.statusBarColor = Color.parseColor("#121212")
                     } else {
-                        animateStatusBarColorChange(requireActivity().window, Color.WHITE)
+                        requireActivity().window.statusBarColor = Color.WHITE
                     }
                 } else {
                     requireActivity().window.decorView.systemUiVisibility =
                         View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                    animateStatusBarColorChange(requireActivity().window, Color.TRANSPARENT)
+                    requireActivity().window.statusBarColor = Color.TRANSPARENT
                 }
             }
         }
@@ -223,7 +224,11 @@ class HomeFragment : Fragment() {
                 putString("query", "")
             }
 
-            findNavController().navigate(R.id.action_start_to_result, bundle)
+            val currentDestination = findNavController().currentDestination
+
+            if (currentDestination?.id == R.id.navigation_home) {
+                findNavController().navigate(R.id.action_start_to_result, bundle)
+            }
         }
     }
 
@@ -236,19 +241,5 @@ class HomeFragment : Fragment() {
         val chooser = Intent.createChooser(intent, "Pilih gambar")
         chooser.putExtra(Intent.EXTRA_INITIAL_INTENTS, arrayOf(pickIntent, captureIntent))
         startActivityForResult(chooser, 1)
-    }
-
-    private fun animateStatusBarColorChange(window: Window, toColor: Int) {
-        window.let {
-            val fromColor = it.statusBarColor
-            val colorAnimation = ValueAnimator.ofObject(ArgbEvaluator(), fromColor, toColor)
-            colorAnimation.duration = 300
-
-            colorAnimation.addUpdateListener { animator ->
-                it.statusBarColor = animator.animatedValue as Int
-            }
-
-            colorAnimation.start()
-        }
     }
 }
